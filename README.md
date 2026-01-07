@@ -145,7 +145,7 @@ The adapter exposes:
 
 - `POST /submit`  
   Body:
-  ```json
+  ```
   { "jcl": "<JCL TEXT>", "expectJson": true }
 ````
 
