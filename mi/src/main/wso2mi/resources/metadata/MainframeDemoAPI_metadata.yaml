@@ -1,0 +1,10 @@
+---
+key: "MainframeDemoAPI-1.0.0"
+name : "MainframeDemoAPI"
+displayName : "MainframeDemoAPI"
+description: "MainframeDemoAPI"
+version: "1.0.0"
+serviceUrl: "https://{MI_HOST}:{MI_PORT}/mainframedemoapi"
+definitionType: "OAS3"
+securityType: "BASIC"
+mutualSSLEnabled: false

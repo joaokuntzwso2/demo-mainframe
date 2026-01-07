@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  tk:
+    image: skunklabz/tk4-hercules:latest
+    container_name: tk
+    #platform: linux/amd64
+    ports:
+      - "3270:3270"   # TN3270 terminal
+      - "8038:8038"   # Hercules web console
+      - "3505:3505"   # Socket reader port
+    volumes:
+      - ./mainframe:/demo
+    restart: unless-stopped
+
+  adapter:
+    build:
+      context: ./adapter
+    container_name: adapter
+    environment:
+      - TK_HOST=tk
+      - TK_SOCKREADER_PORT=3505
+      - PRT_FILE=/demo/out/prt00e.txt
+      - PRT_POLL_INTERVAL_MS=200
+      - PRT_TIMEOUT_SEC=20
+    volumes:
+      - ./mainframe:/demo
+    depends_on:
+      - tk
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+
+  mi:
+    build:
+      context: ./mi
+      dockerfile: deployment/docker/Dockerfile
+    container_name: mi
+    depends_on:
+      - adapter
+    ports:
+      - "8290:8290"
+      - "8253:8253"
+    restart: unless-stopped
+

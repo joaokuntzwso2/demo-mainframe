@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api xmlns="http://ws.apache.org/ns/synapse" name="MainframeDemoAPI" context="/mf">
+
+    <resource methods="GET" uri-template="/account/{id}">
+        <inSequence>
+            <property name="acctId" expression="get-property('uri.var.id')" scope="default"/>
+
+            <payloadFactory media-type="json">
+                <format>{ "jcl": "$1", "expectJson": true }</format>
+                <args>
+                    <arg evaluator="xml" expression="fn:concat(
+'//ACCTINQ  JOB (ACCT),''WSO2DEMO'',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1)', '&#10;',
+'//STEP1   EXEC PGM=ACCTINQ', '&#10;',
+'//STEPLIB DD  DSN=IBMUSER.LOAD,DISP=SHR', '&#10;',
+'//SYSIN   DD  *', '&#10;',
+'ACCTID=', get-property('acctId'), '&#10;',
+'/*', '&#10;'
+)"/>
+                </args>
+            </payloadFactory>
+
+            <call>
+                <endpoint>
+                    <http method="post" uri-template="http://adapter:9000/submit"/>
+                </endpoint>
+            </call>
+
+            <respond/>
+        </inSequence>
+    </resource>
+
+    <resource methods="GET" uri-template="/customer/{id}">
+        <inSequence>
+            <property name="custId" expression="get-property('uri.var.id')" scope="default"/>
+
+            <payloadFactory media-type="json">
+                <format>{ "jcl": "$1", "expectJson": true }</format>
+                <args>
+                    <arg evaluator="xml" expression="fn:concat(
+'//CUSTPROF JOB (CUST),''WSO2DEMO'',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1)', '&#10;',
+'//STEP1   EXEC PGM=CUSTPROF', '&#10;',
+'//STEPLIB DD  DSN=IBMUSER.LOAD,DISP=SHR', '&#10;',
+'//SYSIN   DD  *', '&#10;',
+'CUSTID=', get-property('custId'), '&#10;',
+'/*', '&#10;'
+)"/>
+                </args>
+            </payloadFactory>
+
+            <call>
+                <endpoint>
+                    <http method="post" uri-template="http://adapter:9000/submit"/>
+                </endpoint>
+            </call>
+
+            <respond/>
+        </inSequence>
+    </resource>
+
+    <resource methods="POST" uri-template="/txn">
+        <inSequence>
+            <property name="fromAcct" expression="json-eval($.from)" scope="default"/>
+            <property name="toAcct" expression="json-eval($.to)" scope="default"/>
+            <property name="amount" expression="json-eval($.amount)" scope="default"/>
+            <property name="currency" expression="json-eval($.currency)" scope="default"/>
+
+            <payloadFactory media-type="json">
+                <format>{ "jcl": "$1", "expectJson": true }</format>
+                <args>
+                    <arg evaluator="xml" expression="fn:concat(
+'//TXNPOST  JOB (TXN),''WSO2DEMO'',CLASS=A,MSGCLASS=A,MSGLEVEL=(1,1)', '&#10;',
+'//STEP1   EXEC PGM=TXNPOST', '&#10;',
+'//STEPLIB DD  DSN=IBMUSER.LOAD,DISP=SHR', '&#10;',
+'//SYSIN   DD  *', '&#10;',
+'FROM=', get-property('fromAcct'), '&#10;',
+'TO=', get-property('toAcct'), '&#10;',
+'AMOUNT=', get-property('amount'), '&#10;',
+'CCY=', get-property('currency'), '&#10;',
+'/*', '&#10;'
+)"/>
+                </args>
+            </payloadFactory>
+
+            <call>
+                <endpoint>
+                    <http method="post" uri-template="http://adapter:9000/submit"/>
+                </endpoint>
+            </call>
+
+            <respond/>
+        </inSequence>
+    </resource>
+
+</api>
+
+
