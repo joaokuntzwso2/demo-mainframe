@@ -147,7 +147,10 @@ The adapter exposes:
   Body:
   ```
   { "jcl": "<JCL TEXT>", "expectJson": true }
+
 ````
+
+---
 
 Flow:
 
